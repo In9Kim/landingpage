@@ -76,21 +76,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   } catch (error) {
     console.error('OpenAI API Error:', error)
-    
+
     // OpenAI API 오류에 대한 적절한 응답
     let errorMessage = '죄송합니다. 일시적으로 상담 서비스에 문제가 있습니다. 잠시 후 다시 시도해주세요.'
-    
+    let statusCode = 500
+
     if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+
       if (error.message.includes('insufficient_quota')) {
         errorMessage = '현재 API 사용량이 초과되었습니다. 관리자에게 문의해주세요.'
-      } else if (error.message.includes('invalid_api_key')) {
-        errorMessage = 'API 키 설정에 문제가 있습니다. 관리자에게 문의해주세요.'
+        statusCode = 429
+      } else if (error.message.includes('invalid_api_key') || error.message.includes('Incorrect API key')) {
+        errorMessage = 'OpenAI API 키가 잘못되었습니다. .env.local 파일의 OPENAI_API_KEY를 확인해주세요.'
+        statusCode = 401
+      } else if (error.message.includes('401')) {
+        errorMessage = 'OpenAI API 인증 오류입니다. API 키를 확인해주세요.'
+        statusCode = 401
       }
     }
 
-    res.status(500).json({ 
+    res.status(statusCode).json({
       message: errorMessage,
-      error: process.env.NODE_ENV === 'development' ? error : undefined
+      error: process.env.NODE_ENV === 'development' ? {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      } : undefined
     })
   }
 }

@@ -211,12 +211,12 @@ export class ProductRecommendationEngine {
       const isPrdMainScenario = this.checkPrdMainScenario(motherInfo)
 
       // 각 상품별 추천 평가
-      for (const [productId, product] of this.products) {
+      Array.from(this.products.entries()).forEach(([productId, product]) => {
         const recommendation = this.evaluateProduct(motherInfo, product, isPrdMainScenario)
         if (recommendation.confidence >= 30) { // 최소 신뢰도 30% 이상만 포함
           recommendations.push(recommendation)
         }
-      }
+      })
 
       // 추천 우선순위 정렬 (confidence 내림차순)
       recommendations.sort((a, b) => {

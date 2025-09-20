@@ -183,19 +183,21 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
       })
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('API Error:', response.status, errorData)
         throw new Error(`API Error: ${response.status}`)
       }
 
       const data = await response.json()
-      
+
       // 로딩 메시지 제거
       setMessages(prev => prev.filter(msg => msg.id !== loadingMessageId))
-      
+
       return data.message || '죄송합니다. 응답을 생성할 수 없습니다.'
-      
+
     } catch (error) {
       console.error('OpenAI API 호출 오류:', error)
-      
+
       // 로딩 메시지 제거
       setMessages(prev => prev.filter(msg => msg.isLoading))
       

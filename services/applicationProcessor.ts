@@ -122,6 +122,7 @@ export class ApplicationProcessor {
         personalInfo: false,
         serviceTerms: false,
         marketing: false,
+        thirdParty: false,
         signedAt: new Date(),
         ipAddress: '',
         userAgent: ''

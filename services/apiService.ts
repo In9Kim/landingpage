@@ -106,7 +106,7 @@ export class ApiService {
       
       return this.createApiResponse(true, session)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'CONSULTATION_START_ERROR', '상담 시작 중 오류가 발생했습니다.')
+      return this.createApiResponse<ConsultationSession>(false, undefined, 'CONSULTATION_START_ERROR', '상담 시작 중 오류가 발생했습니다.')
     }
   }
 
@@ -127,7 +127,7 @@ export class ApiService {
       
       return this.createApiResponse(true, updatedSession)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'CONSULTATION_UPDATE_ERROR', '상담 정보 업데이트 중 오류가 발생했습니다.')
+      return this.createApiResponse<ConsultationSession>(false, undefined, 'CONSULTATION_UPDATE_ERROR', '상담 정보 업데이트 중 오류가 발생했습니다.')
     }
   }
 
@@ -146,7 +146,7 @@ export class ApiService {
       
       return this.createApiResponse(true, analysisResult)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'CONSULTATION_COMPLETE_ERROR', '상담 완료 처리 중 오류가 발생했습니다.')
+      return this.createApiResponse<ConsultationAnalysisResult>(false, undefined, 'CONSULTATION_COMPLETE_ERROR', '상담 완료 처리 중 오류가 발생했습니다.')
     }
   }
 
@@ -165,7 +165,7 @@ export class ApiService {
       
       return this.createApiResponse(true, recommendations)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'RECOMMENDATION_ERROR', '상품 추천 생성 중 오류가 발생했습니다.')
+      return this.createApiResponse<ProductRecommendation[]>(false, undefined, 'RECOMMENDATION_ERROR', '상품 추천 생성 중 오류가 발생했습니다.')
     }
   }
 
@@ -180,7 +180,7 @@ export class ApiService {
       
       return this.createApiResponse(true, quote)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'PREMIUM_QUOTE_ERROR', '보험료 견적 조회 중 오류가 발생했습니다.')
+      return this.createApiResponse<PremiumQuoteResponse>(false, undefined, 'PREMIUM_QUOTE_ERROR', '보험료 견적 조회 중 오류가 발생했습니다.')
     }
   }
 
@@ -193,12 +193,12 @@ export class ApiService {
       
       const product = this.recommendationEngine.getProduct(productId as any)
       if (!product) {
-        return this.createApiResponse(false, undefined, 'PRODUCT_NOT_FOUND', '상품을 찾을 수 없습니다.')
+        return this.createApiResponse<any>(false, undefined, 'PRODUCT_NOT_FOUND', '상품을 찾을 수 없습니다.')
       }
       
       return this.createApiResponse(true, product)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'PRODUCT_DETAILS_ERROR', '상품 정보 조회 중 오류가 발생했습니다.')
+      return this.createApiResponse<any>(false, undefined, 'PRODUCT_DETAILS_ERROR', '상품 정보 조회 중 오류가 발생했습니다.')
     }
   }
 
@@ -221,7 +221,7 @@ export class ApiService {
       
       return this.createApiResponse(true, application)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'APPLICATION_CREATE_ERROR', '청약서 생성 중 오류가 발생했습니다.')
+      return this.createApiResponse<ApplicationData>(false, undefined, 'APPLICATION_CREATE_ERROR', '청약서 생성 중 오류가 발생했습니다.')
     }
   }
 
@@ -239,7 +239,7 @@ export class ApiService {
       
       return this.createApiResponse(true, result)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'CUSTOMER_INFO_UPDATE_ERROR', '고객 정보 업데이트 중 오류가 발생했습니다.')
+      return this.createApiResponse<{ success: boolean; errors: ValidationError[] }>(false, undefined, 'CUSTOMER_INFO_UPDATE_ERROR', '고객 정보 업데이트 중 오류가 발생했습니다.')
     }
   }
 
@@ -257,7 +257,7 @@ export class ApiService {
       
       return this.createApiResponse(true, result)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'PAYMENT_INFO_UPDATE_ERROR', '결제 정보 업데이트 중 오류가 발생했습니다.')
+      return this.createApiResponse<{ success: boolean; errors: ValidationError[] }>(false, undefined, 'PAYMENT_INFO_UPDATE_ERROR', '결제 정보 업데이트 중 오류가 발생했습니다.')
     }
   }
 
@@ -276,7 +276,7 @@ export class ApiService {
       
       return this.createApiResponse(true, result)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'AGREEMENTS_UPDATE_ERROR', '약관 동의 업데이트 중 오류가 발생했습니다.')
+      return this.createApiResponse<{ success: boolean; errors: ValidationError[] }>(false, undefined, 'AGREEMENTS_UPDATE_ERROR', '약관 동의 업데이트 중 오류가 발생했습니다.')
     }
   }
 
@@ -291,7 +291,7 @@ export class ApiService {
       
       return this.createApiResponse(true, result)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'APPLICATION_SUBMIT_ERROR', '청약 제출 중 오류가 발생했습니다.')
+      return this.createApiResponse<{ success: boolean; policyNumber?: string; errors?: ValidationError[] }>(false, undefined, 'APPLICATION_SUBMIT_ERROR', '청약 제출 중 오류가 발생했습니다.')
     }
   }
 
@@ -306,7 +306,7 @@ export class ApiService {
       
       return this.createApiResponse(true, status)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'APPLICATION_STATUS_ERROR', '청약 상태 조회 중 오류가 발생했습니다.')
+      return this.createApiResponse<any>(false, undefined, 'APPLICATION_STATUS_ERROR', '청약 상태 조회 중 오류가 발생했습니다.')
     }
   }
 
@@ -321,7 +321,7 @@ export class ApiService {
       
       return this.createApiResponse(true, progress)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'APPLICATION_PROGRESS_ERROR', '청약 진행률 조회 중 오류가 발생했습니다.')
+      return this.createApiResponse<any>(false, undefined, 'APPLICATION_PROGRESS_ERROR', '청약 진행률 조회 중 오류가 발생했습니다.')
     }
   }
 
@@ -341,7 +341,7 @@ export class ApiService {
       
       return this.createApiResponse(true, eligibility)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'GIFT_ELIGIBILITY_ERROR', '선물 자격 확인 중 오류가 발생했습니다.')
+      return this.createApiResponse<any>(false, undefined, 'GIFT_ELIGIBILITY_ERROR', '선물 자격 확인 중 오류가 발생했습니다.')
     }
   }
 
@@ -357,7 +357,7 @@ export class ApiService {
       
       return this.createApiResponse(true, catalog)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'GIFT_CATALOG_ERROR', '선물 카탈로그 조회 중 오류가 발생했습니다.')
+      return this.createApiResponse<any>(false, undefined, 'GIFT_CATALOG_ERROR', '선물 카탈로그 조회 중 오류가 발생했습니다.')
     }
   }
 
@@ -376,7 +376,7 @@ export class ApiService {
       
       return this.createApiResponse(true, result)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'GIFT_SELECTION_ERROR', '선물 선택 중 오류가 발생했습니다.')
+      return this.createApiResponse<{ success: boolean; giftEventId?: string; error?: string }>(false, undefined, 'GIFT_SELECTION_ERROR', '선물 선택 중 오류가 발생했습니다.')
     }
   }
 
@@ -391,7 +391,7 @@ export class ApiService {
       
       return this.createApiResponse(true, giftEvent)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'GIFT_EVENT_ERROR', '선물 이벤트 조회 중 오류가 발생했습니다.')
+      return this.createApiResponse<GiftEvent | null>(false, undefined, 'GIFT_EVENT_ERROR', '선물 이벤트 조회 중 오류가 발생했습니다.')
     }
   }
 
@@ -419,7 +419,7 @@ export class ApiService {
       
       return this.createApiResponse(true, statistics)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'STATISTICS_ERROR', '통계 조회 중 오류가 발생했습니다.')
+      return this.createApiResponse<any>(false, undefined, 'STATISTICS_ERROR', '통계 조회 중 오류가 발생했습니다.')
     }
   }
 
@@ -441,7 +441,7 @@ export class ApiService {
       
       return this.createApiResponse(true, healthStatus)
     } catch (error) {
-      return this.createApiResponse(false, undefined, 'HEALTH_CHECK_ERROR', '시스템 상태 확인 중 오류가 발생했습니다.')
+      return this.createApiResponse<any>(false, undefined, 'HEALTH_CHECK_ERROR', '시스템 상태 확인 중 오류가 발생했습니다.')
     }
   }
 
