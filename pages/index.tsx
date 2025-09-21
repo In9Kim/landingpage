@@ -21,21 +21,21 @@ export default function Home() {
 
       <main className="min-h-screen bg-white">
         {currentStep === 'intro' && (
-          <div className="container mx-auto px-6 py-16">
+          <div className="container mx-auto px-4 md:px-6 py-8 md:py-16">
             {/* Hero Section */}
             <div className="max-w-6xl mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
                 {/* Left Content */}
                 <div>
                   <div className="flex items-center mb-6">
-                    <div className="text-6xl font-bold text-coral mr-2">CARE</div>
-                    <div className="text-6xl font-bold text-coral">+</div>
+                    <div className="text-4xl md:text-6xl font-bold text-coral mr-2">CARE</div>
+                    <div className="text-4xl md:text-6xl font-bold text-coral">+</div>
                   </div>
-                  <h1 className="text-4xl md:text-5xl font-bold text-neutral-800 mb-6 leading-tight">
+                  <h1 className="text-3xl md:text-5xl font-bold text-neutral-800 mb-6 leading-tight">
                     엄마 건강을 더 <span className="text-coral">세심하게</span><br />
                     케어하는 맞춤 보험
                   </h1>
-                  <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
+                  <p className="text-lg md:text-xl text-neutral-600 mb-8 leading-relaxed">
                     AI 케어 상담으로 어머님의 건강 상태를 정확히 분석하고<br />
                     가장 적합한 맞춤 보험을 추천해드립니다.
                   </p>
@@ -43,11 +43,11 @@ export default function Home() {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <button
                       onClick={() => setCurrentStep('chat')}
-                      className="btn-filled text-lg"
+                      className="btn-filled text-base md:text-lg"
                     >
                       CARE+ 맞춤 상담 시작하기
                     </button>
-                    <button className="btn-outlined text-lg">
+                    <button className="btn-outlined text-base md:text-lg">
                       케어 서비스 알아보기
                     </button>
                   </div>
@@ -84,28 +84,28 @@ export default function Home() {
               </div>
 
               {/* Features Section */}
-              <div className="mt-24">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="mt-12 md:mt-24">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                   <div className="text-center">
                     <div className="w-12 h-12 bg-coral-50 rounded-lg flex items-center justify-center mx-auto mb-4">
                       <span className="text-xl">🤖</span>
                     </div>
-                    <h4 className="text-lg font-semibold text-neutral-800 mb-2">AI 케어 상담</h4>
-                    <p className="text-neutral-600">Claude 기반 지능형 상담으로 어머님 건강 상태를 정확히 분석합니다</p>
+                    <h4 className="text-base md:text-lg font-semibold text-neutral-800 mb-2">AI 케어 상담</h4>
+                    <p className="text-sm md:text-base text-neutral-600">Claude 기반 지능형 상담으로 어머님 건강 상태를 정확히 분석합니다</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-coral-50 rounded-lg flex items-center justify-center mx-auto mb-4">
                       <span className="text-xl">🎯</span>
                     </div>
-                    <h4 className="text-lg font-semibold text-neutral-800 mb-2">맞춤 케어 플랜</h4>
-                    <p className="text-neutral-600">개인별 건강 상태와 연령에 최적화된 케어 보험을 추천합니다</p>
+                    <h4 className="text-base md:text-lg font-semibold text-neutral-800 mb-2">맞춤 케어 플랜</h4>
+                    <p className="text-sm md:text-base text-neutral-600">개인별 건강 상태와 연령에 최적화된 케어 보험을 추천합니다</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-coral-50 rounded-lg flex items-center justify-center mx-auto mb-4">
                       <span className="text-xl">⚡</span>
                     </div>
-                    <h4 className="text-lg font-semibold text-neutral-800 mb-2">간편한 절차</h4>
-                    <p className="text-neutral-600">CARE+ 플랫폼에서 간단한 절차로 맞춤 보험 가입이 완료됩니다</p>
+                    <h4 className="text-base md:text-lg font-semibold text-neutral-800 mb-2">간편한 절차</h4>
+                    <p className="text-sm md:text-base text-neutral-600">CARE+ 플랫폼에서 간단한 절차로 맞춤 보험 가입이 완료됩니다</p>
                   </div>
                 </div>
               </div>

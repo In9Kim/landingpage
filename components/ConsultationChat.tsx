@@ -13,28 +13,38 @@ interface ConsultationChatProps {
   onBack: () => void
 }
 
-const ChatBubble = ({ message }: { message: Message }) => (
-  <div className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}>
-    <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
-      message.sender === 'user' 
-        ? 'bg-coral text-white' 
-        : 'bg-white text-neutral-800 shadow-sm border'
-    }`}>
-      {message.isLoading ? (
-        <div className="flex items-center space-x-1">
-          <div className="flex space-x-1">
-            <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+const ChatBubble = ({ message }: { message: Message }) => {
+  const formatText = (text: string) => {
+    // **텍스트** 형태의 볼드 마크다운을 <strong> 태그로 변환
+    return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+  }
+
+  return (
+    <div className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}>
+      <div className={`max-w-md lg:max-w-xl px-4 py-3 rounded-2xl ${
+        message.sender === 'user'
+          ? 'bg-coral text-white'
+          : 'bg-white text-neutral-800 shadow-sm border'
+      }`}>
+        {message.isLoading ? (
+          <div className="flex items-center space-x-1">
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-neutral-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+            <span className="text-xs text-neutral-500 ml-2">효도 설계사가 답변 중...</span>
           </div>
-          <span className="text-xs text-neutral-500 ml-2">효도 설계사가 답변 중...</span>
-        </div>
-      ) : (
-        <p className="text-sm leading-relaxed whitespace-pre-line">{message.text}</p>
-      )}
+        ) : (
+          <div
+            className="text-sm leading-relaxed break-words"
+            dangerouslySetInnerHTML={{ __html: formatText(message.text) }}
+          />
+        )}
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export default function ConsultationChat({ onComplete, onBack }: ConsultationChatProps) {
   const [messages, setMessages] = useState<Message[]>([])
@@ -42,13 +52,14 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
   const [currentStep, setCurrentStep] = useState(0)
   const [motherInfo, setMotherInfo] = useState<any>({})
   const [isAiResponding, setIsAiResponding] = useState(false)
-  const [useOpenAI, setUseOpenAI] = useState(true) // OpenAI 사용 여부 토글
+  const [useOpenAI, setUseOpenAI] = useState(true) // OpenAI 사용 여부 토글 - 기본값 true로 설정
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
+  const [optionsReady, setOptionsReady] = useState(false) // 옵션 선택 가능 상태
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const chatFlow = [
     {
-      aiMessage: "안녕하세요! CARE+ AI 케어 상담사입니다 💐\n\n먼저 어머님 연세대를 선택해주세요.",
+      aiMessage: "**CARE+ 효도상담사**입니다 💐\n\n**어머님 연세**를 선택해주세요.",
       field: 'age',
       options: ['40대', '50대', '60대', '70대', '80대'],
       validation: (input: string) => {
@@ -56,79 +67,79 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
       },
       followUpMessage: (input: string) => {
         if (input.includes('60') || input.includes('70') || input.includes('80')) {
-          return `${input} 어머님이시군요. 더욱 세심한 건강 케어가 필요한 시기이시네요.`
+          return `**${input} 어머님**이시네요. **여성질환 보장**이 중요해요!`
         }
-        return `${input} 어머님을 위한 최적의 케어 플랜을 찾아보겠습니다.`
+        return `**${input} 어머님**을 위한 **맞춤 보장**을 찾아드릴게요 🌸`
       }
     },
     {
-      aiMessage: "어머님의 현재 상황을 선택해주세요.",
+      aiMessage: "**어머님 현재 상황**을 선택해주세요.",
       field: 'occupation',
       options: ['주부', '회사원', '자영업', '은퇴', '기타'],
       followUpMessage: (input: string) => {
         if (input.includes('회사원') || input.includes('자영업')) {
-          return '아직도 활발히 활동하고 계시는군요! 활동적인 어머님이시네요.'
+          return '**활동적인 어머님**이시네요! 💪'
         }
-        return '어머님의 생활 패턴을 고려해서 맞춤 케어 플랜을 찾아드리겠습니다.'
+        return '**생활패턴**을 고려해서 찾아드릴게요.'
       }
     },
     {
-      aiMessage: "어머님의 건강 상태를 선택해주세요. (복수 선택 가능)",
+      aiMessage: "**어머님 건강상태**를 선택해주세요. (복수 선택)",
       field: 'healthStatus',
       options: ['건강함', '갑상선 질환', '자궁 관련 질환', '당뇨', '고혈압', '기타 만성질환'],
       multiSelect: true,
       followUpMessage: (input: string) => {
         if (input.includes('갑상선') || input.includes('자궁')) {
-          return '갑상선이나 자궁 관련 질환을 겪고 계시는군요. 이런 부분을 특별히 고려해서 케어 플랜을 찾아보겠습니다.'
+          return '**여성질환**이 있으시네요. **특화보장**이 필요해요! 💝'
         }
         if (input.includes('건강함')) {
-          return '건강하게 지내고 계시는군요. 예방 차원에서도 좋은 케어가 필요해요.'
+          return '**건강한 어머님**이시네요. **예방보장**을 준비해요! 🌸'
         }
-        return '어머님의 건강 상태를 꼼꼼히 고려해서 맞춤 케어 플랜을 준비해드리겠습니다.'
+        return '**건강상태**를 고려해서 찾아드릴게요.'
       }
     },
     {
-      aiMessage: "가족력으로 걱정되는 질병이 있으시다면 선택해주세요. (복수 선택 가능)",
+      aiMessage: "**가족력**으로 걱정되는 질병이 있나요? (복수 선택)",
       field: 'familyHistory',
       options: ['없음', '암', '갑상선 질환', '자궁 질환', '당뇨', '고혈압', '심장병'],
       multiSelect: true,
       followUpMessage: (input: string) => {
         if (input.includes('암')) {
-          return '가족력에 암이 있으시는군요. 미리 대비해두시는 것이 현명한 선택입니다.'
+          return '**암 가족력**이 있으시네요. **미리 대비**가 중요해요!'
         }
         if (input.includes('갑상선') || input.includes('자궁')) {
-          return '여성 질환 관련 가족력이 있으시는군요. 이 부분을 중점적으로 고려해보겠습니다.'
+          return '**여성질환 가족력**이 있으시네요. **중점 보장**해드릴게요!'
         }
-        return '가족력을 고려한 맞춤 케어 플랜을 준비해드리겠습니다.'
+        return '**가족력**을 고려해서 찾아드릴게요.'
       }
     },
     {
-      aiMessage: "어머님의 건강검진 주기를 선택해주세요.",
+      aiMessage: "**건강검진 주기**를 선택해주세요.",
       field: 'healthCheckup',
       options: ['매년 받음', '2년에 한 번', '불규칙적', '받지 않음'],
       followUpMessage: (input: string) => {
         if (input.includes('매년')) {
-          return '정기적으로 건강검진을 받고 계시는군요. 건강 관리를 잘 하고 계시네요.'
+          return '**정기검진**을 잘 받고 계시네요! 👍'
         }
         if (input.includes('불규칙') || input.includes('받지')) {
-          return '건강검진을 규칙적으로 받지 않고 계시는군요. 케어 플랜과 함께 건강검진도 챙겨보세요.'
+          return '**건강검진**도 함께 챙겨보세요!'
         }
-        return '건강검진 패턴을 고려해서 케어 플랜을 설계해드리겠습니다.'
+        return '**검진패턴**을 고려해드릴게요.'
       }
     },
     {
-      aiMessage: "마지막으로, 어머님께 가장 중요한 케어 포인트를 선택해주세요. (복수 선택 가능)",
+      aiMessage: "**가장 중요한 보장**을 선택해주세요. (복수 선택)",
       field: 'concerns',
       options: ['암 진단 및 치료', '통원 치료비', '수술 및 입원비', '정기 검진', '응급상황 대응', '일상 건강관리'],
       multiSelect: true,
       followUpMessage: (input: string) => {
         if (input.includes('암')) {
-          return '암 진단과 치료에 대한 케어를 중요하게 생각하고 계시는군요.'
+          return '**암보장**을 중요하게 생각하시는군요! 💪'
         }
         if (input.includes('통원') || input.includes('치료비')) {
-          return '실제 치료비와 통원비 부분까지 꼼꼼히 고려해서 케어 플랜을 추천해드리겠습니다.'
+          return '**치료비 보장**까지 꼼꼼히 고려해드릴게요!'
         }
-        return '어머님이 원하시는 케어 내용을 중심으로 최적의 플랜을 찾아드리겠습니다.'
+        return '**원하시는 보장**을 중심으로 찾아드릴게요!'
       }
     }
   ]
@@ -143,8 +154,16 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
 
   useEffect(() => {
     if (currentStep < chatFlow.length) {
+      // 옵션 비활성화
+      setOptionsReady(false)
+
       const timer = setTimeout(() => {
         addMessage('ai', chatFlow[currentStep].aiMessage)
+
+        // AI 질문이 표시된 후 1초 뒤에 옵션 활성화
+        setTimeout(() => {
+          setOptionsReady(true)
+        }, 1000)
       }, 500)
       return () => clearTimeout(timer)
     }
@@ -158,7 +177,30 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
       timestamp: new Date(),
       isLoading
     }
-    setMessages(prev => [...prev, newMessage])
+
+    // 같은 sender의 연속된 메시지는 합치기 (로딩 메시지 제외)
+    if (!isLoading && text.trim()) {
+      setMessages(prev => {
+        const lastMessage = prev[prev.length - 1]
+        if (lastMessage &&
+            lastMessage.sender === sender &&
+            !lastMessage.isLoading &&
+            Date.now() - lastMessage.timestamp.getTime() < 2000) { // 2초 이내의 연속 메시지
+          // 마지막 메시지에 텍스트 추가
+          const updatedMessages = [...prev]
+          updatedMessages[updatedMessages.length - 1] = {
+            ...lastMessage,
+            text: lastMessage.text + ' ' + text,
+            timestamp: new Date()
+          }
+          return updatedMessages
+        }
+        return [...prev, newMessage]
+      })
+    } else {
+      setMessages(prev => [...prev, newMessage])
+    }
+
     return newMessage.id
   }
 
@@ -193,17 +235,47 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
       // 로딩 메시지 제거
       setMessages(prev => prev.filter(msg => msg.id !== loadingMessageId))
 
-      return data.message || '죄송합니다. 응답을 생성할 수 없습니다.'
+      // 응답을 하나의 문자열로 결합 (줄바꿈이나 분할된 응답 처리)
+      const cleanResponse = (data.message || '죄송합니다. 응답을 생성할 수 없습니다.')
+        .replace(/\n+/g, ' ') // 줄바꿈을 공백으로 변경
+        .trim()
+
+      return cleanResponse
 
     } catch (error) {
       console.error('OpenAI API 호출 오류:', error)
 
       // 로딩 메시지 제거
-      setMessages(prev => prev.filter(msg => msg.isLoading))
-      
-      return '죄송합니다. 일시적 문제가 있습니다.'
+      setMessages(prev => prev.filter(msg => !msg.isLoading))
+
+      return '죄송합니다. 일시적으로 AI 상담 서비스에 문제가 있습니다. 직접 입력하시거나 잠시 후 다시 시도해주세요.'
     } finally {
       setIsAiResponding(false)
+    }
+  }
+
+  // fallback 응답 처리 함수
+  const handleFallbackResponse = (currentStepData: any, userMessage: string, newMotherInfo: any) => {
+    // 기본 응답 로직
+    if (currentStepData.followUpMessage) {
+      const followUp = currentStepData.followUpMessage(userMessage)
+      addMessage('ai', followUp)
+    }
+
+    // 다음 단계로 진행
+    if (currentStep < chatFlow.length - 1) {
+      setTimeout(() => {
+        setCurrentStep(prev => prev + 1)
+      }, 1500)
+    } else {
+      // 마지막 단계일 때 완료 처리
+      setTimeout(() => {
+        const summaryMessage = generateSummaryMessage(newMotherInfo)
+        addMessage('ai', summaryMessage)
+        setTimeout(() => {
+          onComplete(newMotherInfo)
+        }, 2000)
+      }, 1000)
     }
   }
 
@@ -256,7 +328,10 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
     }
 
     addMessage('user', messageText)
-    
+
+    // 사용자가 답변한 후 즉시 옵션 비활성화
+    setOptionsReady(false)
+
     const newMotherInfo = {
       ...motherInfo,
       [currentStepData.field]: messageText
@@ -286,8 +361,17 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
         }
       } catch (error) {
         console.error('OpenAI 응답 처리 오류:', error)
-        // 오류 시 기본 로직으로 fallback
-        handleFallbackResponse(currentStepData, userMessage, newMotherInfo)
+
+        // API 에러 메시지 표시
+        addMessage('ai', '죄송합니다. 일시적으로 AI 상담 서비스에 문제가 있습니다. 기본 상담으로 진행하겠습니다.')
+
+        // 기본 로직으로 fallback - OpenAI 사용 비활성화
+        setUseOpenAI(false)
+
+        // 기본 상담 로직으로 처리
+        setTimeout(() => {
+          handleFallbackResponse(currentStepData, userMessage, newMotherInfo)
+        }, 1000)
       }
     } else {
       // 기존 로직 사용
@@ -295,30 +379,6 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
     }
   }
 
-  // 기본 응답 로직 (OpenAI 실패 시 또는 비활성화 시 사용)
-  const handleFallbackResponse = (currentStepData: any, userMessage: string, newMotherInfo: any) => {
-    // Add follow-up message if available
-    if (currentStepData.followUpMessage) {
-      setTimeout(() => {
-        const followUp = currentStepData.followUpMessage(userMessage)
-        addMessage('ai', followUp)
-      }, 500)
-    }
-
-    if (currentStep === chatFlow.length - 1) {
-      setTimeout(() => {
-        const summaryMessage = generateSummaryMessage(newMotherInfo)
-        addMessage('ai', summaryMessage)
-        setTimeout(() => {
-          onComplete(newMotherInfo)
-        }, 2000)
-      }, currentStepData.followUpMessage ? 1500 : 1000)
-    } else {
-      setTimeout(() => {
-        setCurrentStep(prev => prev + 1)
-      }, currentStepData.followUpMessage ? 1500 : 1000)
-    }
-  }
 
   const generateSummaryMessage = (info: any) => {
     const age = parseInt(info.age) || 60
@@ -425,23 +485,26 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
         <div className="max-w-2xl mx-auto">
           {isAiResponding && (
             <div className="mb-3 text-center">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-coral-50 text-coral-600">
+              <span className="chat-typing-indicator rounded-full text-xs bg-coral-50 text-coral-600">
                 <div className="w-2 h-2 bg-coral-400 rounded-full animate-pulse mr-2"></div>
-                CARE+ 상담사가 답변중입니다...
+                CARE+ 답변중...
               </span>
             </div>
           )}
           
-          {/* 옵션 선택 버튼들 */}
-          {currentStep < chatFlow.length && chatFlow[currentStep].options && (
+          {/* 옵션 선택 버튼들 - AI 답변 중이거나 옵션이 준비되지 않았을 때 비활성화 */}
+          {!isAiResponding && currentStep < chatFlow.length && chatFlow[currentStep].options && (
             <div className="mb-4">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
                 {chatFlow[currentStep].options?.map((option, index) => (
                   <button
                     key={index}
-                    onClick={() => handleOptionSelect(option)}
+                    onClick={() => optionsReady ? handleOptionSelect(option) : null}
+                    disabled={!optionsReady}
                     className={`px-3 py-2 rounded-lg text-sm border transition-all ${
-                      selectedOptions.includes(option)
+                      !optionsReady
+                        ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                        : selectedOptions.includes(option)
                         ? 'bg-coral text-white border-coral'
                         : 'bg-white text-neutral-700 border-neutral-300 hover:border-coral hover:bg-coral-50'
                     }`}
@@ -450,9 +513,9 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
                   </button>
                 ))}
               </div>
-              
+
               {/* 다중 선택용 확인 버튼 */}
-              {chatFlow[currentStep].multiSelect && selectedOptions.length > 0 && (
+              {chatFlow[currentStep].multiSelect && selectedOptions.length > 0 && optionsReady && (
                 <div className="text-center">
                   <button
                     onClick={() => handleSendMessage()}
