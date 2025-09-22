@@ -39,6 +39,21 @@ a {
 .bg-coral-100 { background-color: #FFE6CC; }
 .border-coral { border-color: #FF6600; }
 
+/* Additional coral color variations */
+.border-coral-200 { border-color: #FFD4B3; }
+.text-coral-600 { color: #E65A00; }
+.text-coral-700 { color: #CC5200; }
+
+/* Fixed position utilities */
+.fixed { position: fixed; }
+.z-20 { z-index: 20; }
+.top-20 { top: 5rem; }
+.right-4 { right: 1rem; }
+.min-w-[140px] { min-width: 140px; }
+
+/* Additional spacing */
+.mb-2 { margin-bottom: 0.5rem; }
+
 /* Hanwha Colors */
 .text-hanwha-red { color: #FF6600; }
 .bg-hanwha-red { background-color: #FF6600; }

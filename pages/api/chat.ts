@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { message, context, step } = req.body
+    const { message, context, step, systemPrompt, isConsultationMode } = req.body
 
     if (!message) {
       return res.status(400).json({ message: 'Message is required' })
@@ -23,8 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ message: 'OpenAI API 키가 설정되지 않았습니다.' })
     }
 
-    // 한화생명 효도보험 상담사 페르소나 - 간결하고 핵심적인 응답
-    const systemPrompt = `당신은 **한화생명 CARE+ 효도상담사**입니다.
+    // 상담 모드에 따른 시스템 프롬프트 설정
+    const finalSystemPrompt = systemPrompt || `당신은 **한화생명 CARE+ 효도상담사**입니다.
 
 **핵심 원칙:**
 - **1문장으로 간결하게** 응답 (최대 20자 이내)
@@ -56,18 +56,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       messages: [
         {
           role: "system",
-          content: systemPrompt
+          content: finalSystemPrompt
         },
         {
           role: "user",
           content: message
         }
       ],
-      max_tokens: 50,
-      temperature: 0.3,
+      max_tokens: isConsultationMode ? 300 : 50,
+      temperature: isConsultationMode ? 0.1 : 0.3,
       top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0
+      frequency_penalty: 0.5,
+      presence_penalty: 0.5,
+      response_format: isConsultationMode ? { type: "json_object" } : undefined
     })
 
     const aiResponse = completion.choices[0]?.message?.content || '죄송합니다. 응답을 생성할 수 없습니다.'
