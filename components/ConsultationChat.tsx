@@ -8,8 +8,18 @@ interface Message {
   isLoading?: boolean
 }
 
+interface ParentInfo {
+  targetPerson?: string
+  age?: string
+  occupation?: string
+  healthStatus?: string | string[]
+  familyHistory?: string | string[]
+  healthCheckup?: string
+  concerns?: string | string[]
+}
+
 interface ConsultationChatProps {
-  onComplete: (parentInfo: any) => void
+  onComplete: (parentInfo: ParentInfo) => void
   onBack: () => void
 }
 
@@ -50,7 +60,7 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
   const [messages, setMessages] = useState<Message[]>([])
   const [currentInput, setCurrentInput] = useState('')
   const [currentStep, setCurrentStep] = useState(0)
-  const [parentInfo, setParentInfo] = useState<any>({})
+  const [parentInfo, setParentInfo] = useState<ParentInfo>({})
   const [isAiResponding, setIsAiResponding] = useState(false)
   const [useOpenAI, setUseOpenAI] = useState(true) // OpenAI 사용 여부 토글 - 기본값 true로 설정
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
@@ -330,7 +340,7 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
   ]
 
   // OpenAI API 호출 함수
-  const callOpenAI = async (userMessage: string, context: string): Promise<{message: string, shouldComplete: boolean, parentInfo: any}> => {
+  const callOpenAI = async (userMessage: string, context: string): Promise<{message: string, shouldComplete: boolean, parentInfo: Partial<ParentInfo>}> => {
     try {
       setIsAiResponding(true)
 
@@ -356,8 +366,8 @@ ${Object.entries(parentInfo).map(([key, value]) =>
 
 **🚨 CRITICAL 응답 규칙:**
 1. 사용자의 답변에서 정보를 추출하여 JSON에 포함
-2. ${currentQuestionIndex === 0 ? '첫 번째 답변: 절대 질문으로 끝내지 말고, 공감적 확인 메시지만 제공' : '공감적 응답 제공 후 자연스럽게 다음 질문 안내'}
-3. ${isLastQuestion ? '모든 정보 수집 완료시 shouldComplete: true' : '다음 질문은 시스템이 자동으로 처리하므로 질문 포함 금지'}
+2. ${currentQuestionIndex === 0 ? '첫 번째 답변: 절대 질문으로 끝내지 말고, 공감적 확인 메시지만 제공' : isLastQuestion ? '마지막 단계: 상담 완료 메시지와 함께 상품 추천 및 가입 안내 제공' : '공감적 응답 제공 후 자연스럽게 다음 질문 안내'}
+3. ${isLastQuestion ? '모든 정보 수집 완료시 shouldComplete: true, 질문 형태 절대 금지, 상담 완료 및 상품 추천/가입 도움 메시지만 제공' : '다음 질문은 시스템이 자동으로 처리하므로 질문 포함 금지'}
 4. 이미 수집된 정보는 절대 재질문 금지
 5. 간결하고 따뜻한 톤으로 응답
 
@@ -365,7 +375,7 @@ ${Object.entries(parentInfo).map(([key, value]) =>
 {
   "shouldComplete": ${isLastQuestion ? 'true' : 'false'},
   "parentInfo": {"${currentQuestion ? currentQuestion.field : ''}": "사용자_답변에서_추출한_값"},
-  "message": "${currentQuestionIndex === 0 ? '첫 번째는 공감적 확인만: \"**어머님(또는 아버님)**을 위한 보험을 준비해드리겠습니다 💝\"' : isLastQuestion ? '완료 메시지' : '공감적 응답만 (질문 금지)'}"
+  "message": "${currentQuestionIndex === 0 ? '첫 번째는 공감적 확인만: \"**어머님(또는 아버님)**을 위한 보험을 준비해드리겠습니다 💝\"' : isLastQuestion ? '상담 완료 메시지: \"상담이 완료되었습니다. 이제 맞춤 상품을 추천해드리고 가입 방법을 도와드리겠습니다.\"' : '공감적 응답만 (질문 금지)'}"
 }
 
 **대화 스타일:** 💐🌸💝 이모티콘, "**강조**" 사용, 따뜻하고 간결한 톤`
@@ -460,7 +470,7 @@ ${Object.entries(parentInfo).map(([key, value]) =>
   }
 
   // fallback 응답 처리 함수
-  const handleFallbackResponse = (currentStepData: any, userMessage: string, newParentInfo: any) => {
+  const handleFallbackResponse = (currentStepData: any, userMessage: string, newParentInfo: ParentInfo) => {
     // 기본 응답 로직
     if (currentStepData.followUpMessage) {
       const followUp = currentStepData.followUpMessage(userMessage)
@@ -564,7 +574,7 @@ ${Object.entries(parentInfo).map(([key, value]) =>
 
       // 사용자 입력에서 추출된 정보가 있으면 즉시 업데이트
       if (Object.keys(userExtractedInfo).length > 0) {
-        setParentInfo(prev => {
+        setParentInfo((prev: ParentInfo) => {
           const updated = { ...prev, ...userExtractedInfo }
           console.log('사용자 입력에서 정보 추출:', userExtractedInfo, '전체 업데이트:', updated)
           return updated
@@ -580,8 +590,8 @@ ${Object.entries(parentInfo).map(([key, value]) =>
         let extractedValue = null
 
         // 1. LLM 응답에서 정보 추출
-        if (Object.keys(aiResult.parentInfo).length > 0) {
-          extractedValue = aiResult.parentInfo[currentQuestion?.field]
+        if (Object.keys(aiResult.parentInfo).length > 0 && currentQuestion?.field) {
+          extractedValue = (aiResult.parentInfo as any)[currentQuestion.field]
         }
 
         // 2. 패턴 매칭으로 백업 추출
@@ -594,7 +604,7 @@ ${Object.entries(parentInfo).map(([key, value]) =>
         // 정보 업데이트
         let finalParentInfo = parentInfo
         if (extractedValue && currentQuestion) {
-          setParentInfo(prev => {
+          setParentInfo((prev: ParentInfo) => {
             const updated = { ...prev, [currentQuestion.field]: extractedValue }
             console.log('정보 업데이트:', updated)
             finalParentInfo = updated
@@ -686,9 +696,9 @@ ${Object.entries(parentInfo).map(([key, value]) =>
   }
 
 
-  const generateSummaryMessage = (info: any) => {
+  const generateSummaryMessage = (info: ParentInfo) => {
     const genderText = info.targetPerson?.includes('어머님') ? '어머님' : '아버님'
-    const age = parseInt(info.age) || 60
+    const age = parseInt(info.age || '60') || 60
     const isMotherFlow = info.targetPerson?.includes('어머님')
 
     let message = `말씀해주신 ${genderText} 정보를 바탕으로 **맞춤 보험 추천**을 준비했습니다 💝\n\n`
