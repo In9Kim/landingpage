@@ -276,7 +276,7 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
         if (text.includes('회사원') || text.includes('직장') || text.includes('회사') || text.includes('사무')) return '회사원'
         if (text.includes('자영업') || text.includes('사업') || text.includes('운영')) return '자영업'
         if (text.includes('은퇴') || text.includes('퇴직') || text.includes('쉬고')) return '은퇴'
-        return '주부' // 기본값
+        return '은퇴' // 아버님의 경우 기본값을 은퇴로 변경
       }
     },
     {
@@ -351,13 +351,21 @@ export default function ConsultationChat({ onComplete, onBack }: ConsultationCha
       const currentQuestion = requiredQuestions[currentQuestionIndex]
       const totalQuestions = requiredQuestions.length
       const isLastQuestion = currentQuestionIndex >= totalQuestions - 1
+      const isForFather = parentInfo.targetPerson?.includes('아버님')
+
+      // 아버님용 직업 질문 조정
+      let adjustedQuestion = currentQuestion?.question
+      if (currentQuestion?.field === 'occupation' && isForFather) {
+        adjustedQuestion = '**현재 어떤 일을 하고 계시나요?** 💼\n\n회사원, 자영업, 은퇴, 기타 등으로 알려주시면 됩니다.'
+      }
 
       const systemPrompt = `당신은 "CARE+ 효도상담사"입니다. 부모님을 사랑하는 자녀의 마음을 이해하는 따뜻한 상담사입니다.
 
 **📋 구조적 상담 진행 (${currentQuestionIndex + 1}/${totalQuestions})**
 
-**현재 질문:** ${currentQuestion ? currentQuestion.question : '완료'}
+**현재 질문:** ${adjustedQuestion || '완료'}
 **현재 필드:** ${currentQuestion ? currentQuestion.field : '완료'}
+**대상:** ${parentInfo.targetPerson || '미정'}
 
 **이미 수집된 정보:**
 ${Object.entries(parentInfo).map(([key, value]) =>
@@ -541,8 +549,11 @@ ${Object.entries(parentInfo).map(([key, value]) =>
     if (useOpenAI) {
       // OpenAI 모드: 자유로운 대화
       addMessage('user', messageText)
-      setCurrentInput('')
-      setSelectedOptions([])
+      // 입력 필드 초기화를 약간 지연시켜 사용자가 입력한 내용을 확인할 수 있도록
+      setTimeout(() => {
+        setCurrentInput('')
+        setSelectedOptions([])
+      }, 100)
 
       // 사용자 입력에서 직접 정보 추출 (백업 메커니즘)
       const userExtractedInfo: any = {}
@@ -928,6 +939,7 @@ ${Object.entries(parentInfo).map(([key, value]) =>
                   : isAiResponding ? "AI 응답을 기다리는 중..." : "메시지를 입력하세요..."
               }
               className="flex-1 border border-neutral-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-coral focus:border-transparent disabled:bg-neutral-100 disabled:text-neutral-500 disabled:border-neutral-200"
+              style={{ fontSize: '16px' }} // 모바일에서 줌 방지를 위한 최소 폰트 크기
               disabled={isAiResponding || (!useOpenAI && currentStep >= chatFlow.length)}
             />
             <button
