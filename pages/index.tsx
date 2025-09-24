@@ -147,16 +147,45 @@ export default function Home() {
         {/* Fixed Floating Button - only show on intro step */}
         {currentStep === 'intro' && (
           <div
-            className="fixed bottom-4 z-50"
             style={{
+              position: 'fixed',
+              bottom: '80px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '280px'
+              width: '90%',
+              maxWidth: '320px',
+              zIndex: 9999,
+              padding: '0 16px'
             }}
           >
             <button
               onClick={() => setCurrentStep('chat')}
-              className="btn-filled text-lg py-4 shadow-lg w-full"
+              style={{
+                width: '100%',
+                minHeight: '56px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                border: '2px solid #FF6600',
+                backgroundColor: '#FF6600',
+                color: '#FFFFFF',
+                padding: '16px 24px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = '#E55A00';
+                e.target.style.borderColor = '#E55A00';
+                e.target.style.transform = 'translateY(-1px)';
+                e.target.style.boxShadow = '0 4px 12px rgba(255, 102, 0, 0.3)';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = '#FF6600';
+                e.target.style.borderColor = '#FF6600';
+                e.target.style.transform = 'none';
+                e.target.style.boxShadow = '0 10px 15px -3px rgb(0 0 0 / 0.1)';
+              }}
             >
               CARE+ 맞춤 상담 시작하기
             </button>
