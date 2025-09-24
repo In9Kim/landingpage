@@ -175,16 +175,18 @@ export default function Home() {
                 transition: 'all 0.2s ease'
               }}
               onMouseOver={(e) => {
-                e.target.style.backgroundColor = '#E55A00';
-                e.target.style.borderColor = '#E55A00';
-                e.target.style.transform = 'translateY(-1px)';
-                e.target.style.boxShadow = '0 4px 12px rgba(255, 102, 0, 0.3)';
+                const target = e.target as HTMLButtonElement;
+                target.style.backgroundColor = '#E55A00';
+                target.style.borderColor = '#E55A00';
+                target.style.transform = 'translateY(-1px)';
+                target.style.boxShadow = '0 4px 12px rgba(255, 102, 0, 0.3)';
               }}
               onMouseOut={(e) => {
-                e.target.style.backgroundColor = '#FF6600';
-                e.target.style.borderColor = '#FF6600';
-                e.target.style.transform = 'none';
-                e.target.style.boxShadow = '0 10px 15px -3px rgb(0 0 0 / 0.1)';
+                const target = e.target as HTMLButtonElement;
+                target.style.backgroundColor = '#FF6600';
+                target.style.borderColor = '#FF6600';
+                target.style.transform = 'none';
+                target.style.boxShadow = '0 10px 15px -3px rgb(0 0 0 / 0.1)';
               }}
             >
               CARE+ 맞춤 상담 시작하기
