@@ -11,6 +11,7 @@ interface Product {
   keyFeatures: string[]
   targetConditions: string[]
   emotionalMessage: string
+  url: string
 }
 
 interface ProductRecommendationProps {
@@ -36,11 +37,12 @@ const products: Product[] = [
       '63세 어머님 기준 최적화된 보장 설계'
     ],
     targetConditions: ['thyroid', 'uterine', 'cancer', 'age60+', 'working', 'familyHistory'],
-    emotionalMessage: '갑상선과 자궁 질환 이력이 있는 어머님께 가장 적합한 맞춤 보장입니다 💐'
+    emotionalMessage: '갑상선과 자궁 질환 이력이 있는 어머님께 가장 적합한 맞춤 보장입니다 💐',
+    url: 'https://direct.hanwhalife.com/products/CMS00017'
   },
   {
     id: 'e-health',
-    name: 'e건강보험',
+    name: 'e시그니처건강보험(암뇌심)',
     type: 'health',
     monthlyPremium: 41000,
     coverage: ['갑상선·자궁 등 여성질환 집중 케어', '생활습관병 종합 보장', '건강검진 지원 서비스'],
@@ -54,7 +56,8 @@ const products: Product[] = [
       '만성질환 관리 및 통원 치료비 지원'
     ],
     targetConditions: ['chronicDisease', 'lifestyle', 'healthCare', 'age60+', 'prevention'],
-    emotionalMessage: '전반적 건강 관리와 예방을 중요시하는 어머님께 적합합니다'
+    emotionalMessage: '전반적 건강 관리와 예방을 중요시하는 어머님께 적합합니다',
+    url: 'https://direct.hanwhalife.com/products/CMS00025'
   },
   {
     id: 'e-term',
@@ -72,15 +75,27 @@ const products: Product[] = [
       '가족 부양과 미래 계획을 고려한 보장'
     ],
     targetConditions: ['familySupport', 'deathBenefit', 'age60+', 'working', 'economicStability'],
-    emotionalMessage: '재정적 안정과 가족 사랑을 중시하는 어머님께 적합합니다'
+    emotionalMessage: '재정적 안정과 가족 사랑을 중시하는 어머님께 적합합니다',
+    url: 'https://direct.hanwhalife.com/products/CM090101'
   }
 ]
 
-const ProductCard = ({ product, isRecommended, onSelect }: { 
+const ProductCard = ({ product, isRecommended, onSelect }: {
   product: Product
   isRecommended: boolean
-  onSelect: () => void 
-}) => (
+  onSelect: () => void
+}) => {
+  const handleSelect = () => {
+    if (isRecommended) {
+      // 추천 상품인 경우 외부 URL로 이동
+      window.open(product.url, '_blank')
+    } else {
+      // 비추천 상품인 경우 기존 로직 사용
+      onSelect()
+    }
+  }
+
+  return (
   <div className={`bg-white rounded-2xl p-6 shadow-sm border transition-all duration-200 ${
     isRecommended ? 'border-coral bg-coral-50' : 'border-neutral-200 hover:border-coral'
   }`}>
@@ -133,15 +148,16 @@ const ProductCard = ({ product, isRecommended, onSelect }: {
     )}
 
     <button
-      onClick={onSelect}
+      onClick={handleSelect}
       className={`w-full font-medium ${
         isRecommended ? 'btn-filled' : 'btn-outlined'
       }`}
     >
-      {isRecommended ? '이 상품으로 진행하기' : '자세히 보기'}
+      {isRecommended ? '바로 가입 시작하기' : '자세히 보기'}
     </button>
   </div>
-)
+  )
+}
 
 export default function ProductRecommendation({ motherInfo, onProductSelect, onBack }: ProductRecommendationProps) {
   const [recommendedProduct, setRecommendedProduct] = useState<Product | null>(null)
@@ -227,10 +243,10 @@ export default function ProductRecommendation({ motherInfo, onProductSelect, onB
         <div className="bg-white rounded-2xl p-6 mb-8 border max-w-3xl mx-auto">
           <div className="text-center mb-6">
             <div className="w-16 h-16 bg-coral-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">💝</span>
+              <span className="text-2xl">✅</span>
             </div>
             <h3 className="text-2xl font-bold text-neutral-800 mb-2">
-              어머님을 위한 CARE+ 추천이 완료되었어요
+              어머님을 위한 맞춤 상품 추천이 완료되었어요
             </h3>
             <p className="text-neutral-600">
               어머님의 {motherInfo.age}세, {motherInfo.healthStatus} 상태를 고려해서<br />
@@ -337,11 +353,11 @@ export default function ProductRecommendation({ motherInfo, onProductSelect, onB
 
           {showComparison && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
+              {products.filter(product => product.id !== recommendedProduct?.id).map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
-                  isRecommended={product.id === recommendedProduct?.id}
+                  isRecommended={false}
                   onSelect={() => onProductSelect(product)}
                 />
               ))}

@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>CARE+ - 엄마를 위한 맞춤 케어 보험</title>
+        <title>우리엄마 맞춤 보험 설계</title>
         <meta name="description" content="CARE+로 엄마 건강을 더 세심하게 케어하세요" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
@@ -21,7 +21,7 @@ export default function Home() {
 
       <main className="min-h-screen bg-white">
         {currentStep === 'intro' && (
-          <div className="container mx-auto px-4 md:px-6 py-8 md:py-16">
+          <div className="container mx-auto px-4 md:px-6 py-8 md:py-16" style={{ paddingBottom: '100px' }}>
             {/* Hero Section */}
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
@@ -36,20 +36,11 @@ export default function Home() {
                     케어하는 맞춤 보험
                   </h1>
                   <p className="text-lg md:text-xl text-neutral-600 mb-8 leading-relaxed">
-                    AI 케어 상담으로 어머님의 건강 상태를 정확히 분석하고<br />
-                    가장 적합한 맞춤 보험을 추천해드립니다.
+                    AI케어 상담으로 어머님의 건강 상태를 정확히 분석하고 가장 적합한 맞춤 보험을 추천해드립니다.
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button
-                      onClick={() => setCurrentStep('chat')}
-                      className="btn-filled text-base md:text-lg"
-                    >
-                      CARE+ 맞춤 상담 시작하기
-                    </button>
-                    <button className="btn-outlined text-base md:text-lg">
-                      케어 서비스 알아보기
-                    </button>
+                    {/* 일반 버튼은 숨김 */}
                   </div>
                 </div>
 
@@ -91,21 +82,21 @@ export default function Home() {
                       <span className="text-xl">🤖</span>
                     </div>
                     <h4 className="text-base md:text-lg font-semibold text-neutral-800 mb-2">AI 케어 상담</h4>
-                    <p className="text-sm md:text-base text-neutral-600">Claude 기반 지능형 상담으로 어머님 건강 상태를 정확히 분석합니다</p>
+                    <p className="text-sm md:text-base text-neutral-600">보험 상담 특화 AI 모델이 상담 내용 기반으로 고객 니즈를 정확히 분석합니다</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-coral-50 rounded-lg flex items-center justify-center mx-auto mb-4">
                       <span className="text-xl">🎯</span>
                     </div>
                     <h4 className="text-base md:text-lg font-semibold text-neutral-800 mb-2">맞춤 케어 플랜</h4>
-                    <p className="text-sm md:text-base text-neutral-600">개인별 건강 상태와 연령에 최적화된 케어 보험을 추천합니다</p>
+                    <p className="text-sm md:text-base text-neutral-600">부모님의 라이프스타일, 건강 상태, 연령에 최적화된 보험을 추천합니다</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-coral-50 rounded-lg flex items-center justify-center mx-auto mb-4">
                       <span className="text-xl">⚡</span>
                     </div>
                     <h4 className="text-base md:text-lg font-semibold text-neutral-800 mb-2">간편한 절차</h4>
-                    <p className="text-sm md:text-base text-neutral-600">CARE+ 플랫폼에서 간단한 절차로 맞춤 보험 가입이 완료됩니다</p>
+                    <p className="text-sm md:text-base text-neutral-600">상담 후 간단한 절차로 가입까지 바로 할 수 있습니다</p>
                   </div>
                 </div>
               </div>
@@ -151,6 +142,25 @@ export default function Home() {
               setSelectedProduct(null)
             }}
           />
+        )}
+
+        {/* Fixed Floating Button - only show on intro step */}
+        {currentStep === 'intro' && (
+          <div
+            className="fixed bottom-4 z-50"
+            style={{
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '280px'
+            }}
+          >
+            <button
+              onClick={() => setCurrentStep('chat')}
+              className="btn-filled text-lg py-4 shadow-lg w-full"
+            >
+              CARE+ 맞춤 상담 시작하기
+            </button>
+          </div>
         )}
       </main>
     </>
